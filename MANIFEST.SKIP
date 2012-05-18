@@ -1,0 +1,14 @@
+^WWWJDIC.pm
+^blib
+.*\.tmp
+build.log
+boot\/.*
+\.~\d+~
+_build\/.*
+MANIFEST.bak
+MANIFEST.SKIP
+MANIFEST
+^backup
+^tests
+.*\.txt
+^Build$

@@ -1,0 +1,49 @@
+Name: WWW::WWWJDIC
+Description: Get information from online Japanese dictionary WWWJDIC
+Version: 0.01
+Author: Ben Bullock <benkasminbullock@gmail.com>
+
+INTRODUCTION
+
+WWW::WWWJDIC is a Perl module which extracts information from WWWJDIC, an
+online Japanese dictionary maintained by Professor Jim Breen.
+
+INSTALLING THIS MODULE
+
+To install the module on your system, run the script "Build.PL" using
+Perl,
+
+    perl Build.PL
+
+then type
+
+    ./Build
+    ./Build test
+    ./Build install
+
+to complete the installation. You need to have the Perl module
+"Module::Build" already installed. To obtain "Module::Build", use the
+"cpan" command provided with Perl as follows:
+
+    cpan Module::Build
+
+
+
+WWW::WWWJDIC also depends on the following modules, available via CPAN:
+
+LWP::UserAgent
+HTML::TreeBuilder
+URI::Escape
+
+You can obtain these from the internet using the "cpan" command plus
+the name of the module.
+
+
+
+USING THIS MODULE
+
+To use this module, please follow the instructions given in the module
+itself, which can be accessed using
+
+    perldoc WWW::WWWJDIC
+
