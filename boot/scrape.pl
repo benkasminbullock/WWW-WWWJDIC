@@ -2,10 +2,11 @@
 use warnings;
 use strict;
 use LWP::Simple;
+my $toppage = "http://www.csse.monash.edu.au/~jwb/cgi-bin/wwwjdic.cgi?1C";
+if (0) {
 my $source = "WWWJDIC.pm";
 die "no $source" unless -f $source;
 my %scraped_info;
-my $toppage = "http://www.csse.monash.edu.au/~jwb/cgi-bin/wwwjdic.cgi?1C";
 my $docpage = "http://www.csse.monash.edu.au/~jwb/wwwjdicinf.html";
 get_mirrors(\%scraped_info, $toppage);
 get_codes(\%scraped_info, $docpage);
@@ -16,7 +17,10 @@ backupfile ($backup);
 rename $source, "backup/$source" or die $!;
 rename $destination, $source or die $!;
 exit (0);
-
+}
+else {
+    get_mirrors_nice ($toppage);
+}
 sub replace_scrapes
 {
     my ($source, $destination, $scraped_info) = @_;
@@ -75,7 +79,7 @@ sub get_mirrors
 	if ($options) {
 	    if (/<\s*option.*value\s*=\s*"([0-9A-Z])"\s*>\s*(.*)/i) {
 		$options {$1} = $2;
-#		print "Value $1 dictionary '$2'\n";
+		print "Value $1 dictionary '$2'\n";
 	    }
 	    $options = undef if (/<\/select>/);
 	}
@@ -83,16 +87,52 @@ sub get_mirrors
 	if ($mirrors) {
 	    $mirrors = undef if (/<\/td>/);
 	    if (/<a\s+href="(.*)">(.*)<\/a>/i) {
-#		print "Mirror in '$2' at '$1'\n";
 		my $mirror = $1;
 		my $place = lc $2;
 		$mirror =~ s/\?1C//;
+		print "$place => $mirror\n";
 		$mirrors{$place} = $mirror;
 	    }
 	}
     }
     $scraped_info->{mirrors} = \%mirrors;
     $scraped_info->{options} = \%options;
+}
+
+sub get_mirrors_nice
+{
+    my ($url) = @_;
+    my $html = get ($url);
+    my @lines = split /\n/, $html;
+    my $options;
+    my %options;
+    my $mirrors;
+    my %mirrors;
+    for (@lines) {
+#	print;
+	if (/Dictionary:/ && /<select/i) {
+#	    print "Found options\n";
+	    $options = 1;
+	}
+	if ($options) {
+	    if (/<\s*option.*value\s*=\s*"([0-9A-Z])"\s*>\s*(.*)/i) {
+		$options {$1} = $2;
+		print "Value $1 dictionary '$2'\n";
+	    }
+	    $options = undef if (/<\/select>/);
+	}
+	$mirrors = 1 if /Mirror Sites:/i;
+	if ($mirrors) {
+	    $mirrors = undef if (/<\/td>/);
+	    if (/<a\s+href="(.*)">(.*)<\/a>/i) {
+		my $mirror = $1;
+		my $place = lc $2;
+		$mirror =~ s/\?1C//;
+		print "'$place' => '$mirror',\n";
+		$mirrors{$place} = $mirror;
+	    }
+	}
+    }
 }
 
 sub get_codes
