@@ -13,6 +13,7 @@ WriteMakefile (
 	'LWP::UserAgent' => '0',
 	'HTML::TreeBuilder' => '0',
 	'URI::Escape' => '0',
+	'JSON::Parse' => '0.23',
     },
 );
 

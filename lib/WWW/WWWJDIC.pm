@@ -10,16 +10,13 @@ use utf8;
 use LWP::UserAgent;
 use HTML::TreeBuilder;
 use URI::Escape;
+use JSON::Parse 'json_file_to_perl';
 
-my %mirrors = (
-'australia' => 'http://www.csse.monash.edu.au/~jwb/cgi-bin/wwwjdic.cgi',
-'canada' => 'http://www.ottix.net/cgi-bin/wwwjdic/wwwjdic',
-'germany' => 'http://wwwjdic.biz/cgi-bin/wwwjdic',
-'japan' => 'http://gengo.com/wwwjdic/cgi-data/wwwjdic',
-'sweden' => 'http://wwwjdic.se/cgi-bin/wwwjdic.cgi',
-'usa' => 'http://www.edrdg.org/cgi-bin/wwwjdic/wwwjdic',
-);
+my $jfile = __FILE__;
+$jfile =~ s/\.pm/.json/;
+my $j = json_file_to_perl ($jfile);
 
+my %mirrors = %{$j->{mirrors}};
 
 my %dictionaries = (
 'AV' => 'aviation ',
