@@ -3,12 +3,13 @@ use warnings;
 use strict;
 use LWP::Simple;
 use FindBin;
-use JSON 'encode_json';
+use JSON::Create 'create_json';
 my $verbose;
-my $toppage = "http://www.csse.monash.edu.au/~jwb/cgi-bin/wwwjdic.cgi?1C";
+my $toppage = "http://gengo.com/wwwjdic/cgi-data/wwwjdic?1C";
+#http://www.edrdg.org/cgi-bin/wwwjdic/wwwjdic?1C";
 my $stuff = get_mirrors_nice ($toppage);
 open my $out, ">:encoding(utf8)", "$FindBin::Bin/../lib/WWW/WWWJDIC.json" or die $!;
-print $out encode_json ($stuff);
+print $out create_json ($stuff);
 close $out or die $!;
 exit;
 
@@ -31,21 +32,42 @@ sub get_mirrors_nice
 	    if (/<\s*option.*value\s*=\s*"([0-9A-Z])"\s*>\s*(.*)/i) {
 		$options {$1} = $2;
 		if ($verbose) {
-		print "Value $1 dictionary '$2'\n";
-	    }
+		    print "Value $1 dictionary '$2'\n";
+		}
 	    }
 	    $options = undef if (/<\/select>/);
 	}
-	$mirrors = 1 if /Mirror Sites:/i;
+	if (/Mirror Sites:/i) {
+	    $mirrors = 1;
+	}
 	if ($mirrors) {
-	    $mirrors = undef if (/<\/td>/);
+	    if (/<\/td>/) {
+		$mirrors = undef;
+	    }
 	    if (/<a\s+href="(.*)">(.*)<\/a>/i) {
 		my $mirror = $1;
 		my $place = lc $2;
+		# Put the name of the location within Australia since
+		# there are two of them.
+		if ($place =~ /australia/i) {
+		    if ($place =~ /(melb|monash)/i) {
+			my $aloc = lc ($1);
+			$place = "australia_$aloc";
+			print "$place\n";
+		    }
+		    else {
+			die "Unparsed australian name $place";
+		    }
+		}
+			print "$place\n";
+
+		if ($place =~ /full.*list/) {
+		    next;
+		}
 		$mirror =~ s/\?1C//;
 		if ($verbose) {
-		print "'$place' => '$mirror',\n";
-	    }
+		    print "'$place' => '$mirror',\n";
+		}
 		$mirrors{$place} = $mirror;
 	    }
 	}

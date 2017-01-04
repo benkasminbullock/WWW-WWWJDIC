@@ -2,12 +2,13 @@
 use warnings;
 use strict;
 use LWP::Simple;
-my $toppage = "http://www.csse.monash.edu.au/~jwb/cgi-bin/wwwjdic.cgi?1C";
+my $toppage = "http://gengo.com/wwwjdic/cgi-data/wwwjdic?1C";
+#http://www.edrdg.org/cgi-bin/wwwjdic/wwwjdic?1C";
 if (0) {
 my $source = "WWWJDIC.pm";
 die "no $source" unless -f $source;
 my %scraped_info;
-my $docpage = "http://www.csse.monash.edu.au/~jwb/wwwjdicinf.html";
+my $docpage = "http://www.edrdg.org/wwwjdic/wwwjdicinf.html";
 get_mirrors(\%scraped_info, $toppage);
 get_codes(\%scraped_info, $docpage);
 my $destination = "$source.backup";
