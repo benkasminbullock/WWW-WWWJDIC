@@ -6,9 +6,15 @@ boot\/.*
 \.~\d+~
 _build\/.*
 MANIFEST.bak
-MANIFEST.SKIP
-MANIFEST
 ^backup
 ^tests
 .*\.txt
 ^Build$
+xt/.*\.t
+^(?:make-pod|clean|build)\.pl$
+examples/.*-out\.txt$
+\.git/.*
+\.gitignore
+pm_to_blib
+MYMETA\..*
+^Makefile$

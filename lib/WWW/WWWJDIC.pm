@@ -294,10 +294,11 @@ Look up a word in WWWJDIC.
 The module relies on the structure of the WWWJDIC reply page, which
 seems to change every few months.
 
-<h1>COPYRIGHT</h1>
+=head1 AUTHOR
 
 Copyright 2009 Ben Bullock <benkasminbullock@gmail.com>
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
+
 
