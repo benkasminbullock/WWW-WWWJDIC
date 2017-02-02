@@ -29,7 +29,7 @@ sub get_mirrors_nice
 	    $options = 1;
 	}
 	if ($options) {
-	    if (/<\s*option.*value\s*=\s*"([0-9A-Z])"\s*>\s*(.*)/i) {
+	    if (/<\s*option.*value\s*=\s*"([0-9A-Z])"\s*>\s*([^<]*)/i) {
 		$options {$1} = $2;
 		if ($verbose) {
 		    print "Value $1 dictionary '$2'\n";
@@ -53,13 +53,13 @@ sub get_mirrors_nice
 		    if ($place =~ /(melb|monash)/i) {
 			my $aloc = lc ($1);
 			$place = "australia_$aloc";
-			print "$place\n";
+#			print "$place\n";
 		    }
 		    else {
 			die "Unparsed australian name $place";
 		    }
 		}
-			print "$place\n";
+#			print "$place\n";
 
 		if ($place =~ /full.*list/) {
 		    next;
