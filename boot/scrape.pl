@@ -2,22 +2,23 @@
 use warnings;
 use strict;
 use LWP::Simple;
+use File::Versions 'make_backup';
 my $toppage = "http://gengo.com/wwwjdic/cgi-data/wwwjdic?1C";
 #http://www.edrdg.org/cgi-bin/wwwjdic/wwwjdic?1C";
 if (0) {
-my $source = "WWWJDIC.pm";
-die "no $source" unless -f $source;
-my %scraped_info;
-my $docpage = "http://www.edrdg.org/wwwjdic/wwwjdicinf.html";
-get_mirrors(\%scraped_info, $toppage);
-get_codes(\%scraped_info, $docpage);
-my $destination = "$source.backup";
-replace_scrapes ($source, $destination, \%scraped_info);
-my $backup = "backup/$source";
-backupfile ($backup);
-rename $source, "backup/$source" or die $!;
-rename $destination, $source or die $!;
-exit (0);
+    my $source = "WWWJDIC.pm";
+    die "no $source" unless -f $source;
+    my %scraped_info;
+    my $docpage = "http://www.edrdg.org/wwwjdic/wwwjdicinf.html";
+    get_mirrors(\%scraped_info, $toppage);
+    get_codes(\%scraped_info, $docpage);
+    my $destination = "$source.backup";
+    replace_scrapes ($source, $destination, \%scraped_info);
+    my $backup = "backup/$source";
+    make_backup ($backup);
+    rename $source, "backup/$source" or die $!;
+    rename $destination, $source or die $!;
+    exit (0);
 }
 else {
     get_mirrors_nice ($toppage);
@@ -200,29 +201,5 @@ sub add_code
 	print STDERR "Duplicate code for '$code'\n";
     } else {
 	$codes->{$code} = $meaning;
-    }
-}
-sub backupfile
-{
-    my ($hfile) = @_;
-    if (-f $hfile) {
-        my @hfiles = <$hfile.~*~>;
-        my $newest = 0;
-        for my $backup (@hfiles) {
-            if ($backup =~ /^$hfile.~(\d+)~$/) {
-                my $number = $1;
-                if ($number > $newest) {
-                    $newest = $number;
-                }
-            }
-        }
-        $newest++;
-        my $backupfilename = "$hfile.~$newest~";
-        if ( -f  $backupfilename) {
-            print STDERR "Bug in backup maker";
-            exit (1);
-        } else {
-            rename $hfile, $backupfilename or die $!;
-        }
     }
 }
