@@ -41,10 +41,10 @@ and the values are the URLs of the mirrors.  As of this version, the
 following sites are available:
 
 =over
-[% FOR mirror IN wwwjdicinfo.mirrors.keys %]
+[% FOR mirror IN wwwjdicinfo.mirrors.keys.sort %]
 =item [% mirror %]
 
-[% wwwjdicinfo.mirrors.$mirror %]
+L<[% wwwjdicinfo.mirrors.$mirror %]>
 [% END %]
 =back
 
