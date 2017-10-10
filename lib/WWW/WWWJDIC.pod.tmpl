@@ -1,15 +1,20 @@
 [% start_year=2009 %]
-[% MACRO example(file) BLOCK %]
-[%- pl =  file _ ".pl" -%]
+[%- MACRO example(file) BLOCK %]
+[%- pl = file _ ".pl" -%]
 [%- out = file _ "-out.txt" -%]
-[% INCLUDE $pl | xtidy %]
+[%- INCLUDE $pl | xtidy %]
+
+produces output
+
+[% INCLUDE $out | xtidy %]
+
 (This example is included as L<F<[% pl %]>|https://fastapi.metacpan.org/source/BKB/[% info.name %]-[% info.version %]/examples/[% pl %]> in the distribution.)
 [% END %]
 =encoding UTF-8
 
 =head1 NAME
 
-WWW::WWWJDIC - Get information from online Japanese dictionary WWWJDIC
+WWW::WWWJDIC - information about online Japanese dictionary WWWJDIC
 
 =head1 SYNOPSIS
 
@@ -32,7 +37,16 @@ Get information about the WWWJDIC online Japanese dictionaries.
     my %mirrors = get_mirrors ();
 
 Get a list of mirrors of WWWJDIC. The keys are arbitrary identifiers,
-and the values are the URLs of the mirrors.
+and the values are the URLs of the mirrors.  As of this version, the
+following sites are available:
+
+=over
+[% FOR mirror IN wwwjdicinfo.mirrors.keys %]
+=item [% mirror %]
+
+[% wwwjdicinfo.mirrors.$mirror %]
+[% END %]
+=back
 
 =head1 METHODS
 
@@ -49,18 +63,8 @@ The arguments are a hash with the following keys:
 =item mirror
 
 Set the mirror site to use for L</lookup_url>. The possible values can
-be obtained from L</get_mirrors>. As of this version, the following
-sites are available:
-
-=over
-[% FOR mirror IN wwwjdicinfo.mirrors.keys %]
-=item [% mirror %]
-
-[% wwwjdicinfo.mirrors.$mirror %]
-[% END %]
-=back
-
-If you do not specify a mirror, the current default value is C<usa>.
+be obtained from L</get_mirrors>. If you do not specify a mirror, the
+current default value is C<usa>.
 
 Please note that mirrors may change or go out of service, and new
 mirrors may be created. The above mirrors are obtained using the
@@ -71,17 +75,45 @@ not part of the CPAN distribution.
 
 =head2 lookup_url
 
-    my $url = $wwwjdic->lookup_url ($key, $search_type);
+    my $url = $wwwjdic->lookup_url ($key);
 
-For example,
+Make a lookup url (the "backdoor URL") which links to a WWWJDIC
+page. As of version [% info.version %], this URL goes to the combined
+dictionary page.
 
-[% example("look-up-url") %]
+=head1 SEE ALSO
 
-Make a lookup url (the "backdoor URL") which links to a WWWJDIC page.
+=over
+
+=item WWWJDIC user guide
+
+L<WWWJDIC Japanese Dictionary Server User Guide|http://nihongo.monash.edu/wwwjdicinf.html>
+
+=back
 
 =head1 BUGS
 
+=over
+
+=item *
+
 Mirrors (including the main edrdg one) frequently go out of service.
+
+=item *
+
+The return value of L</lookup_url> may become invalid as WWWJDIC's
+options are often changed so that different letters and numbers are
+used to indicate the various dictionaries.
+
+=item *
+
+There is no way to set the dictionary in L</lookup_url>.
+
+=item *
+
+There is no way to get the URL for the plain text output of WWWJDIC.
+
+=back
 
 =head1 HISTORY
 

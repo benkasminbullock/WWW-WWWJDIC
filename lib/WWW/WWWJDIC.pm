@@ -16,7 +16,7 @@ my $j = json_file_to_perl ($jfile);
 
 my %mirrors = %{$j->{mirrors}};
 
-my %dictionaries = (
+our %dictionaries = (
 'AV' => 'aviation ',
 'BU' => 'buddhdic',
 'CA' => 'cardic',
@@ -42,7 +42,7 @@ my %dictionaries = (
 'ST' => 'stardict',
 );
 
-my %codes = (
+our %codes = (
 'Buddh' => 'Buddhism',
 'MA' => 'martial arts',
 'P' => '"Priority" entry, i.e. among approx. 20,000 words deemed to be common in Japanese',
@@ -129,6 +129,10 @@ sub get_mirrors
     return %mirrors;
 }
 
+# Default mirror
+
+our $default = 'usa';
+
 sub new
 {
     my ($class, %options) = @_;
@@ -140,14 +144,12 @@ sub new
 	}
 	else {
 	    print STDERR __PACKAGE__,
-		": unknown mirror '$options{mirror}': using Australian site\n";
+		": unknown mirror '$options{mirror}': using $default\n";
 	}
     }
     else {
-	$wwwjdic->{site} = $mirrors{usa};
+	$wwwjdic->{site} = $mirrors{$default};
     }
-    $wwwjdic->{user_agent} = LWP::UserAgent->new;
-    $wwwjdic->{user_agent}->agent(__PACKAGE__);
     bless $wwwjdic;
     return $wwwjdic;
 }
@@ -157,13 +159,13 @@ sub lookup_url
     my ($wwwjdic, $search_key, $search_type) = @_;
     my %type;
     for (@$search_type) {
-	$type{max} = $_ if /^\d+$/;
+	$type{max} = $_ if /^[0-9]+$/;
     }
     my $url = $wwwjdic->{site}; # Start off with the site.
-    # N = all the dictionaries.
+    # Q = all the dictionaries.
     # M = backdoor entry.
     # search type = U: UTF-8 lookup
-    $url .= "?NMUJ";
+    $url .= "?QMUJ";
     my $search_key_encoded = URI::Escape::uri_escape_utf8 ($search_key);
     $url .= $search_key_encoded;
     # This means UTF-8 encoding. I don't think this is documented

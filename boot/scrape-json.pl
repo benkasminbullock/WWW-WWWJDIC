@@ -4,7 +4,11 @@ use strict;
 use LWP::Simple;
 use FindBin '$Bin';
 use JSON::Create 'create_json';
+use Getopt::Long;
 my $verbose;
+GetOptions (
+verbose => \$verbose,
+);
 my $toppage = "http://www.edrdg.org/cgi-bin/wwwjdic/wwwjdic?1C";
 my $stuff = get_mirrors_nice ($toppage);
 open my $out, ">:encoding(utf8)", "$Bin/../lib/WWW/WWWJDIC.json" or die $!;
@@ -29,9 +33,12 @@ sub get_mirrors_nice
 	}
 	if ($options) {
 	    if (/<\s*option.*value\s*=\s*"([0-9A-Z])"\s*>\s*([^<]*)/i) {
-		$options {$1} = $2;
+		my $dic = $1;
+		my $value = $2;
+		$value =~ s/^\s+|\s+$//g;
+		$options {$dic} = $value;
 		if ($verbose) {
-		    print "Value $1 dictionary '$2'\n";
+		    print "Value $dic dictionary '$value'\n";
 		}
 	    }
 	    $options = undef if (/<\/select>/);
