@@ -1,4 +1,0 @@
-author: Ben Bullock
-email: bkb@cpan.org
-licence: perl
-version: 0.01

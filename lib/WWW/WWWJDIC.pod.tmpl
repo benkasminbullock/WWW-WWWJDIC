@@ -23,17 +23,51 @@ corresponding to git commit L<[% commit.commit %]|[% info.repo
 
 =head1 DESCRIPTION
 
-Scrape the WWWJDIC online dictionaries.
+Get information about the WWWJDIC online Japanese dictionaries.
+
+=head1 FUNCTIONS
+
+=head2 get_mirrors
+
+    my %mirrors = get_mirrors ();
+
+Get a list of mirrors of WWWJDIC. The keys are arbitrary identifiers,
+and the values are the URLs of the mirrors.
 
 =head1 METHODS
 
 =head2 new
 
-    my $wwwjdic = WWW::WWWJDIC::new (mirror => "japan")
+    my $wwwjdic = WWW::WWWJDIC->new (mirror => "japan")
 
-Create the object which extracts the information from WWWJDIC. Arguments:
+Create the object which extracts the information from WWWJDIC. 
 
-mirror: Mirror site. This can take the values @SCRAPE MIRROR NAMES@.
+The arguments are a hash with the following keys:
+
+=over
+
+=item mirror
+
+Set the mirror site to use for L</lookup_url>. The possible values can
+be obtained from L</get_mirrors>. As of this version, the following
+sites are available:
+
+=over
+[% FOR mirror IN wwwjdicinfo.mirrors.keys %]
+=item [% mirror %]
+
+[% wwwjdicinfo.mirrors.$mirror %]
+[% END %]
+=back
+
+If you do not specify a mirror, the current default value is C<usa>.
+
+Please note that mirrors may change or go out of service, and new
+mirrors may be created. The above mirrors are obtained using the
+script F<boot/scrape-json.pl> in the git repository. This script is
+not part of the CPAN distribution.
+
+=back
 
 =head2 lookup_url
 
@@ -41,25 +75,21 @@ mirror: Mirror site. This can take the values @SCRAPE MIRROR NAMES@.
 
 For example,
 
-    my $wwwjdic = WWW::WWWJDIC->new();
-    $wwwjdic->lookup_url ("日本");
-
-returns a value C<http://>
+[% example("look-up-url") %]
 
 Make a lookup url (the "backdoor URL") which links to a WWWJDIC page.
 
-=head2 lookup
-
-Look up a word in WWWJDIC.
-
-=head2 parse_results
-
-    $html = <contents of WWWJDIC page>;
-    my $results = $wwwjdic->parse_results ($html);
-    
 =head1 BUGS
 
-The module relies on the structure of the WWWJDIC reply page, which
-seems to change every few months.
+Mirrors (including the main edrdg one) frequently go out of service.
+
+=head1 HISTORY
+
+I started this module as a scraper for the WWWJDIC web site in around
+2009. I released it to CPAN in 2017, but with documentation unwritten
+and with scraper code which no longer worked. Currently the only
+active use I have for this module is to get the list of mirrors. In
+version 0.003 I removed the scraper code, leaving only the method
+L</lookup_url> and the function L</get_mirrors>.
 
 [% INCLUDE "author" %]

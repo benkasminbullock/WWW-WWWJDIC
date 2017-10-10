@@ -6,6 +6,7 @@ use FindBin '$Bin';
 use Perl::Build qw/get_info get_commit/;
 use Perl::Build::Pod ':all';
 use BKB::Stuff;
+use JSON::Parse ':all';
 
 make_examples ("$Bin/examples", undef, undef);
 
@@ -30,6 +31,10 @@ my $tt = Template->new (
 my $info = get_info ();
 $vars{info} = $info;
 $vars{commit} = get_commit ();
+my $json = "$Bin/lib/WWW/WWWJDIC.json";
+die "no $json" unless -f $json;
+my $wwwjdicinfo = json_file_to_perl ($json);
+$vars{wwwjdicinfo} = $wwwjdicinfo;
 my $pod = $info->{pod};
 chmod 0644, $pod;
 $tt->process ("$pod.tmpl", \%vars, $pod) or die '' . $tt->error ();

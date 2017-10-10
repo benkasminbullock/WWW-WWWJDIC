@@ -4,11 +4,9 @@ require Exporter;
 @EXPORT_OK = qw/get_mirrors/;
 use warnings;
 use strict;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use Encode qw/encode decode/;
 use utf8;
-use LWP::UserAgent;
-use HTML::TreeBuilder;
 use URI::Escape;
 use JSON::Parse 'json_file_to_perl';
 
@@ -133,70 +131,25 @@ sub get_mirrors
 
 sub new
 {
-    my %options = @_;
+    my ($class, %options) = @_;
     my $wwwjdic = {};
     if ($options{mirror}) {
 	my $mirror = lc $options{mirror};
 	if ($mirrors{$mirror}) {
 	    $wwwjdic->{site} = $mirrors{$mirror};
-	} else {
+	}
+	else {
 	    print STDERR __PACKAGE__,
 		": unknown mirror '$options{mirror}': using Australian site\n";
 	}
-    } else {
-	$wwwjdic->{site} = $mirrors{australia};
+    }
+    else {
+	$wwwjdic->{site} = $mirrors{usa};
     }
     $wwwjdic->{user_agent} = LWP::UserAgent->new;
     $wwwjdic->{user_agent}->agent(__PACKAGE__);
     bless $wwwjdic;
     return $wwwjdic;
-}
-
-binmode STDOUT,":utf8";
-
-
-sub parse_results
-{
-    my ($wwwjdic, $contents) = @_;
-    $contents = decode ('utf8', $contents);
-    my $tree = HTML::TreeBuilder->new();
-    $tree->parse ($contents);
-
-    my @labels = $tree->look_down ('_tag', 'label');
-    my @inputs = $tree->look_down ('_tag', 'input');
-    my %fors;
-    my @valid;
-    for my $input (@inputs) {
-	if ($input->attr('name') && $input->attr('name') eq 'jukugosel' 
-	    && $input->attr('id')) {
-	    $fors{$input->attr('id')} = $input;
-	}
-    }
-    @valid = grep {$fors{$_->attr('for')}} @labels;
-    for my $line (@valid) {
-	my %results;
-	$results{wwwjdic_id} = $line->attr('id');
-	my $text = $line->as_text;
-	print $text,"\n";
-	$results{text} = $text;
-	if ($text =~ /^(.*?)\s*【\s*(.*?)\s*】\s*(.*?)\s*$/) {
-	    $results{kanji} = $1;
-	    $results{reading} = $2;
-	    $results{meaning} = $3;
-	} elsif ($text =~ /(.*?)  (.*)$/) {
-	    $results{reading} = $1;
-	    $results{meaning} = $2;
-	} else {
-	    print "Unreadable line '$text'\n";
-	}
-	# Get the dictionary from the end of the string.
-	if ($results{meaning}) {
-	    if ($results{meaning} =~ /(.*)\s*([A-Z]{2}[12]?)\s*$/s) {
-		$results{meaning} = $1;
-		$results{dictionary} = $2;
-	    }
-	}
-    }
 }
 
 sub lookup_url
@@ -219,33 +172,6 @@ sub lookup_url
     # Maximum number of results to return.
     $url .= '_' . $type{max} if $type{max};
     return $url;
-}
-
-
-
-
-
-
-
-
-
-
-sub lookup
-{
-    my ($wwwjdic, $search_key, $search_type) = @_;
-    my $search_string = $wwwjdic->lookup_url ($search_key, $search_type);
-    return if !$search_string;
-    my $response = $wwwjdic->{user_agent}->get ($search_string);
-    if ($response->is_success) {
-	return $wwwjdic->parse_results ($response->content);
-    }
-}
-
-sub lookup_kanji
-{
-    my ($wwwjdic, $search_key, $search_type) = @_;
-    my $search_string = $wwwjdic->lookup_url ($search_key, $search_type);
-
 }
 
 1;

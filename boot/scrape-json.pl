@@ -5,11 +5,10 @@ use LWP::Simple;
 use FindBin '$Bin';
 use JSON::Create 'create_json';
 my $verbose;
-my $toppage = "http://gengo.com/wwwjdic/cgi-data/wwwjdic?1C";
-#http://www.edrdg.org/cgi-bin/wwwjdic/wwwjdic?1C";
+my $toppage = "http://www.edrdg.org/cgi-bin/wwwjdic/wwwjdic?1C";
 my $stuff = get_mirrors_nice ($toppage);
 open my $out, ">:encoding(utf8)", "$Bin/../lib/WWW/WWWJDIC.json" or die $!;
-print $out create_json ($stuff);
+print $out create_json ($stuff), "\n";
 close $out or die $!;
 exit;
 
