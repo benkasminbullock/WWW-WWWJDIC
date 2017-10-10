@@ -91,6 +91,17 @@ L<WWWJDIC Japanese Dictionary Server User Guide|http://nihongo.monash.edu/wwwjdi
 
 =back
 
+=head1 DEPENDENCIES
+
+=item L<URI::Escape>
+
+This is used by L</lookup_url> to form the URL.
+
+=item L<JSON::Parse>
+
+This is used to parse the information about WWWJDIC, which is
+internally stored in the JSON format.
+
 =head1 BUGS
 
 =over
