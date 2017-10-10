@@ -3,26 +3,12 @@ use warnings;
 use strict;
 use LWP::Simple;
 use File::Versions 'make_backup';
-my $toppage = "http://gengo.com/wwwjdic/cgi-data/wwwjdic?1C";
-#http://www.edrdg.org/cgi-bin/wwwjdic/wwwjdic?1C";
-if (0) {
-    my $source = "WWWJDIC.pm";
-    die "no $source" unless -f $source;
-    my %scraped_info;
-    my $docpage = "http://www.edrdg.org/wwwjdic/wwwjdicinf.html";
-    get_mirrors(\%scraped_info, $toppage);
-    get_codes(\%scraped_info, $docpage);
-    my $destination = "$source.backup";
-    replace_scrapes ($source, $destination, \%scraped_info);
-    my $backup = "backup/$source";
-    make_backup ($backup);
-    rename $source, "backup/$source" or die $!;
-    rename $destination, $source or die $!;
-    exit (0);
-}
-else {
-    get_mirrors_nice ($toppage);
-}
+my $verbose;
+my $toppage = "http://www.edrdg.org/cgi-bin/wwwjdic/wwwjdic?1C";
+#http://gengo.com/wwwjdic/cgi-data/wwwjdic?1C";
+get_mirrors_nice ($toppage);
+exit;
+
 sub replace_scrapes
 {
     my ($source, $destination, $scraped_info) = @_;
@@ -34,26 +20,28 @@ sub replace_scrapes
     my $outputting;
     while (<$input>) {
  	if (/#\s*SCRAPE\s*([A-Z]+)/) {
- 	    print $output $_;
+	    print $output $_;
  	    $outputting = 1;
  	    my $name = lc $1;
  	    if ($scraped_info->{$name}) {
- 		print $output "my \%$name = (\n";
+		print $output "my \%$name = (\n";
  		my $h = $scraped_info->{$name};
  		for my $key (sort keys %$h) {
 		    my $out = $h->{$key};
 		    $out =~ s/'/\\'/g;
- 		    print $output "'$key' => '$out',\n";
- 		}
- 		print $output ");\n";
-	    } else {
+		    print $output "'$key' => '$out',\n";
+		}
+		print $output ");\n";
+	    }
+	    else {
 		die "No scraped information for '$name'";
 	    }
 	}
 	if ($outputting) {
 	    if (/\#\s*END\s+SCRAPE/) {
 		$outputting = 0;
-	    } else {
+	    }
+	    else {
 		next;
 	    }
 	}
@@ -73,9 +61,7 @@ sub get_mirrors
     my $mirrors;
     my %mirrors;
     for (@lines) {
-#	print;
 	if (/Dictionary:/ && /<select/i) {
-#	    print "Found options\n";
 	    $options = 1;
 	}
 	if ($options) {
@@ -92,7 +78,9 @@ sub get_mirrors
 		my $mirror = $1;
 		my $place = lc $2;
 		$mirror =~ s/\?1C//;
-		print "$place => $mirror\n";
+		if ($verbose) {
+		    print "$place => $mirror\n";
+		}
 		$mirrors{$place} = $mirror;
 	    }
 	}
@@ -104,6 +92,9 @@ sub get_mirrors
 sub get_mirrors_nice
 {
     my ($url) = @_;
+    if ($verbose) {
+	print "Getting $url\n";
+    }
     my $html = get ($url);
     my @lines = split /\n/, $html;
     my $options;
@@ -111,9 +102,9 @@ sub get_mirrors_nice
     my $mirrors;
     my %mirrors;
     for (@lines) {
-#	print;
+	#	print;
 	if (/Dictionary:/ && /<select/i) {
-#	    print "Found options\n";
+	    #	    print "Found options\n";
 	    $options = 1;
 	}
 	if ($options) {
@@ -130,7 +121,7 @@ sub get_mirrors_nice
 		my $mirror = $1;
 		my $place = lc $2;
 		$mirror =~ s/\?1C//;
-		print "'$place' => '$mirror',\n";
+		#		    print "'$place' => '$mirror',\n";
 		$mirrors{$place} = $mirror;
 	    }
 	}
@@ -140,6 +131,9 @@ sub get_mirrors_nice
 sub get_codes
 {
     my ($scraped_info, $url) = @_;
+    if ($verbose) {
+	print "Getting $url\n";
+    }
     my $html = get ($url);
     my @lines = split /\n/, $html;
     my $dictionaries = 0;
@@ -149,15 +143,12 @@ sub get_codes
     my $splitcodes = 0;
     my $firstline;
     for (@lines) {
-#	print;
 	if (/Dictionary File Codes/) {
-#	    print "Found dictionaries\n";
 	    $dictionaries = 1;
 	}
 	if ($dictionaries) {
 	    if (m!<TD>\s*<B>\s*([A-Z0-9]+)\s*</B>\s*</TD>\s*<TD>(.*)</TD>!i) {
 		$dictionaries {$1} = $2;
-#		print "Dictionary code $1 dictionary '$2'\n";
 	    }
 	    $dictionaries = 0 if (/<\/table>/i);
 	}
@@ -167,7 +158,6 @@ sub get_codes
 	if ($codes) {
 	    if (m!<TD><B>\s*(.*?)\s*</B></TD>\s*<TD>\s*(.*?)\s*</TD>!i) {
 		add_code (\%codes, $1, $2);
-#		print "Abbreviation: '$1' = '$2'\n";
 	    }
 	    $codes = 0 if (/<\/table>/i);
 	}
@@ -179,10 +169,10 @@ sub get_codes
 	    if ($firstline) {
 		if (m!<TD>\s*(.*?)\s*</TD>!) {
 		    add_code (\%codes, $firstline, $1);
-#		    print "Abbreviation: '$firstline' = '$1'\n";
 		}
 		$firstline = 0;
-	    } elsif (m!<TD><B>\s*(.*?)\s*</B></TD>!) {
+	    }
+	    elsif (m!<TD><B>\s*(.*?)\s*</B></TD>!) {
 		$firstline = $1;
 	    }
 	}
@@ -199,7 +189,8 @@ sub add_code
     return if ($code eq "-");
     if ($codes->{$code}) {
 	print STDERR "Duplicate code for '$code'\n";
-    } else {
+    }
+    else {
 	$codes->{$code} = $meaning;
     }
 }
