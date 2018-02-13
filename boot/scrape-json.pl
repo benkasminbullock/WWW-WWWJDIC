@@ -20,6 +20,7 @@ sub get_mirrors_nice
 {
     my ($url) = @_;
     my $html = get ($url);
+    $html =~ s{<!--.*?-->}{}gsm;
     my @lines = split /\n/, $html;
     my $options;
     my %options;
@@ -55,18 +56,19 @@ sub get_mirrors_nice
 		my $place = lc $2;
 		# Put the name of the location within Australia since
 		# there are two of them.
-		if ($place =~ /australia/i) {
-		    if ($place =~ /(melb|monash)/i) {
-			my $aloc = lc ($1);
-			$place = "australia_$aloc";
+ 		if ($place =~ /australia/i) {
+		    $place = 'australia';
+# 		    if ($place =~ /(melb|monash)/i) {
+# 			my $aloc = lc ($1);
+# 			$place = "australia_$aloc";
+# #			print "$place\n";
+# 		    }
+# 		    else {
+# 			die "Unparsed australian name $place";
+# 		    }
+# 		}
 #			print "$place\n";
-		    }
-		    else {
-			die "Unparsed australian name $place";
-		    }
 		}
-#			print "$place\n";
-
 		if ($place =~ /full.*list/) {
 		    next;
 		}
