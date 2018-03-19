@@ -4,3 +4,4 @@ examples/*-out.txt
 MANIFEST
 README
 lib/WWW/WWWJDIC.json
+WWW-WWWJDIC-[0-9]*
