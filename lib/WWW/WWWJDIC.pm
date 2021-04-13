@@ -8,11 +8,11 @@ our $VERSION = '0.005';
 use Encode qw/encode decode/;
 use utf8;
 use URI::Escape;
-use JSON::Parse 'json_file_to_perl';
+use JSON::Parse 'read_json';
 
 my $jfile = __FILE__;
 $jfile =~ s/\.pm/.json/;
-my $j = json_file_to_perl ($jfile);
+my $j = read_json ($jfile);
 
 my %mirrors = %{$j->{mirrors}};
 

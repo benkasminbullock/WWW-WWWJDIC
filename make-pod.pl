@@ -33,7 +33,7 @@ $vars{info} = $info;
 $vars{commit} = get_commit ();
 my $json = "$Bin/lib/WWW/WWWJDIC.json";
 die "no $json" unless -f $json;
-my $wwwjdicinfo = json_file_to_perl ($json);
+my $wwwjdicinfo = read_json ($json);
 $vars{wwwjdicinfo} = $wwwjdicinfo;
 my $pod = $info->{pod};
 chmod 0644, $pod;
