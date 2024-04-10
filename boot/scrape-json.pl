@@ -9,7 +9,7 @@ my $verbose;
 GetOptions (
 verbose => \$verbose,
 );
-my $toppage = "http://www.edrdg.org/cgi-bin/wwwjdic/wwwjdic?1C";
+my $toppage = "https://www.edrdg.org/cgi-bin/wwwjdic/wwwjdic?1C";
 my $stuff = get_mirrors_nice ($toppage);
 open my $out, ">:encoding(utf8)", "$Bin/../lib/WWW/WWWJDIC.json" or die $!;
 print $out create_json ($stuff), "\n";
