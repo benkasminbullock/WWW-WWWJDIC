@@ -57,17 +57,11 @@ sub get_mirrors_nice
 		# Put the name of the location within Australia since
 		# there are two of them.
  		if ($place =~ /australia/i) {
+		    # Don't include the melbourne server
+ 		    if ($place =~ /(melb)/i) {
+			next;
+		    }
 		    $place = 'australia';
-# 		    if ($place =~ /(melb|monash)/i) {
-# 			my $aloc = lc ($1);
-# 			$place = "australia_$aloc";
-# #			print "$place\n";
-# 		    }
-# 		    else {
-# 			die "Unparsed australian name $place";
-# 		    }
-# 		}
-#			print "$place\n";
 		}
 		if ($place =~ /full.*list/) {
 		    next;
